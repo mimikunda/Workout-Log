@@ -1,6 +1,6 @@
 type,exercise,subexercise,exercise_slovene,reps,weight,date,occasion,short_note,whole_note
-Body,Weight,Scale,Teža,,71.35kg,2025-02-22,,"zjutraj","na tešče",
-Body,Height,Standing,Višina,,182cm,2024-12-30,,,,
+Body,Weight,Scale,Teža,,71.35kg,2025-02-22,,"zjutraj","na tešče"
+Body,Height,Standing,Višina,,182cm,2024-12-30,,,
 Body,Weight,Scale,Teža,,73.7kg,2025-03-10,"Športni karton","popoldne","za sportni karton"
 Body,Height,Standing,Višina,,183.7cm,2025-03-10,"Športni karton",," za sportni karton",
 Other,Bench,,/slo,5,65kg,2024-01-01,Pre-training max,,
