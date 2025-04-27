@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            text-align: center;
+            color: white;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hidden-dot {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 5px;
+            height: 5px;
+            background-color: #333333;
+            cursor: pointer;
+        }
+
+        .hidden-dot:hover {
+            background-color: #000; /* Becomes visible only on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Website</h1> <br>
+    <p>There's nothing much here!</p>
+    <div class="hidden-dot" onclick="window.location.href='choose.html';"></div>
+</body>
+</html>

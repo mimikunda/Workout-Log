@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Log</title>
+  <style>
+    :root {
+      --accent-color: #00ff99;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #ccc;
+    }
+
+    header {
+      background-color: #121212;
+      color: var(--accent-color);
+      padding: 10px 20px;
+      text-align: center;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      background: #222;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      background-color: #111;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #333;
+      color: var(--accent-color);
+    }
+
+    .legend {
+      font-style: italic;
+      font-size: 0.9em;
+      color: var(--accent-color);
+    }
+
+    .inactive {
+      color: #666;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Workout Log</h1>
+  </header>
+  <div class="container">
+    <!-- Powerlifting Section -->
+    <div class="section">
+      <h2>Powerlifting</h2>
+
+      <h3>Bench Press - Power Style</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Bench Press - Legs in Air</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Deadlift - Conventional Style</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Weightlifting Section -->
+    <div class="section">
+      <h2>Weightlifting</h2>
+
+      <h3>Clean (Nalog)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Snatch (Poteg)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Jerk (Sunek)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Other Section -->
+    <div class="section">
+      <h2>Other</h2>
+
+      <h3>Bench Press</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Squat</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+
+      <h3>Deadlift</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Bootcamp Section -->
+    <div class="section">
+      <h2>MyJunior (Boot Camp)</h2>
+
+      <h3>AMRAP (Trening 1)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Duration</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Legend Section -->
+    <div class="section legend">
+      <h3>Legend</h3>
+      <ul>
+        <li>[---] no data</li>
+        <li>[...] other exercises present, but no data</li>
+        <li>[(DD.MM.YY)] date. If a value is 00, then that part of the date is unknown or irrelevant</li>
+        <li><em>[Italic text]</em> note</li>
+        <li><del>[Strikethrough text]</del> no longer performed</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

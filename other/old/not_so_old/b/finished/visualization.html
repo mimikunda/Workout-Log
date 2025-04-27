@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.1"></script>
+    <style>
+        :root { --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff); }
+        body { font-family: Arial, sans-serif; background: #000; color: #ccc; margin: 0; padding: 0; }
+        header { background: #121212; padding: 20px; border-bottom: 2px solid #333; }
+        h1 { margin: 0; font-size: 2.5em; color: transparent; background-image: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; }
+        .chart-container { width: 90%; margin: 30px auto; background: #222; padding: 25px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 255, 153, 0.1); }
+        canvas { width: 100%!important; height: 500px!important; }
+        a { color: #00ccff; text-decoration: none; transition: color 0.3s; } a:hover { color: #00ff99; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Workout Visualizations</h1>
+        <a href="maximain.html">Back to Log</a>
+    </header>
+    <div class="chart-container">
+        <canvas id="progressChart"></canvas>
+    </div>
+
+    <script>
+        const { DateTime } = luxon;
+
+        async function createVisualizations() {
+            const response = await fetch('workouts.csv');
+            const csvData = await response.text();
+            const workouts = parseCSV(csvData);
+            renderChart(workouts);
+        }
+
+        function parseCSV(csv) {
+            return csv.split('\n').slice(1)
+                .filter(row => row.trim())
+                .map(row => {
+                    const cells = [];
+                    let currentCell = '';
+                    let inQuotes = false;
+
+                    for (const char of row) {
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            cells.push(currentCell.trim());
+                            currentCell = '';
+                        } else {
+                            currentCell += char;
+                        }
+                    }
+                    cells.push(currentCell.trim());
+                    
+                    return {
+                        exercise: cells[1],
+                        weight: cells[5],
+                        date: cells[6]
+                    };
+                })
+                .filter(workout => 
+                    workout.weight && workout.date &&
+                    workout.weight !== 'unknown' &&
+                    workout.date !== 'unknown' &&
+                    DateTime.fromISO(workout.date).isValid
+                );
+        }
+
+        function renderChart(data) {
+            const datasets = {};
+            
+            data.forEach(workout => {
+                const weightValue = parseFloat(workout.weight.replace('kg', ''));
+                const date = DateTime.fromISO(workout.date);
+
+                if (isNaN(weightValue)) return;
+
+                if (!datasets[workout.exercise]) {
+                    datasets[workout.exercise] = {
+                        label: workout.exercise,
+                        data: [],
+                        borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff'
+                    };
+                }
+                
+                datasets[workout.exercise].data.push({
+                    x: date.toJSDate(),
+                    y: weightValue
+                });
+            });
+
+            new Chart(document.getElementById('progressChart'), {
+                type: 'line',
+                data: { datasets: Object.values(datasets) },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                tooltipFormat: 'MMM dd, yyyy'
+                            },
+                            adapters: {
+                                date: DateTime
+                            },
+                            grid: { color: '#333' },
+                            ticks: { color: '#ccc' }
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Weight (kg)',
+                                color: '#ccc'
+                            },
+                            grid: { color: '#333' },
+                            ticks: { color: '#ccc' },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ccc' }
+                        }
+                    }
+                }
+            });
+        }
+
+        createVisualizations();
+    </script>
+</body>
+</html>

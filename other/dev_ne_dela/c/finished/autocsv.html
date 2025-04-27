@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Entry Wizard</title>
+    <style> 
+    :root {
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+                }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+        }   
+       
+        .weight-input { display: flex; }
+        .step { display: none; }
+        .active { display: block; }
+        .progress-bar { width: 100%; height: 20px; background: #000; }
+        .progress { height: 100%; background: var(--accent-gradient); transition: width 0.3s; }
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; }
+        input, button, select { margin: 10px 0; padding: 8px; }
+        button { background: var(--accent-gradient); color: #000; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        #copySection { display: none; margin-top: 20px; }
+        #csvOutput { width: 100%; padding: 8px; margin-top: 10px; }
+        
+        h2, p {
+        color: #00ccff;
+        }
+        
+        input, textarea, select {
+            background-color: #0e0e0e;
+            border: none;
+            border-radius: 6px;
+            color: #00ccff;
+            width: 100%;
+        }
+        
+        .custom-input {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .chart-container { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress" style="width: 0%"></div>
+    </div>
+
+    <form id="workoutForm">
+        <!-- Step 1 -->
+        <div class="step active" data-step="1">
+            <h2>Type & Exercise</h2>
+            <select name="type" required onchange="toggleCustomInput(this, 'custom_type')">
+                <option value="">Select Type</option>
+            </select>
+            <input type="text" class="custom-input" placeholder="Custom Type" name="custom_type">
+            
+            <select name="exercise" required onchange="toggleCustomInput(this, 'custom_exercise')">
+                <option value="">Select Exercise</option>
+            </select>
+            <input type="text" class="custom-input" placeholder="Custom Exercise" name="custom_exercise">
+            
+            <button type="button" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" data-step="2">
+            <h2>Details</h2>
+            <select name="subexercise" onchange="toggleCustomInput(this, 'custom_subexercise')">
+                <option value="">Select Subexercise</option>
+            </select>
+            <input type="text" class="custom-input" placeholder="Custom Subexercise" name="custom_subexercise">
+            
+            <select name="exercise_slovene" onchange="toggleCustomInput(this, 'custom_slovene')">
+                <option value="">Select Slovene Name</option>
+            </select>
+            <input type="text" class="custom-input" placeholder="Custom Slovene Name" name="custom_slovene">
+            
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(3)">Next</button>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" data-step="3">
+            <input type="number" placeholder="Reps" name="reps" required>
+            <div class="weight-input">
+               <input type="number" step="0.1" placeholder="Weight" name="weight">
+                <select name="weight_unit" style="width: 30%; margin-left: 5px;">
+                    <option value="kg">kg</option>
+                    <option value="lbs">lbs</option>
+                    <option value="cm">cm</option>
+                    <option value="m">m</option>
+                </select>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(4)">Next</button>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step" data-step="4">
+            <h2>Date & Notes</h2>
+            <input type="date" name="date" required>
+            
+            <select name="occasion" onchange="toggleCustomInput(this, 'custom_occasion')">
+                <option value="">Select Occasion</option>
+            </select>
+            <input type="text" class="custom-input" placeholder="Custom Occasion" name="custom_occasion">
+            
+            <input type="text" placeholder="Short Note" name="short_note">
+            <textarea placeholder="Whole Note" name="whole_note"></textarea>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Finish</button>
+        </div>
+    </form>
+
+    <div id="copySection">
+        <p>Copy the CSV line below:</p>
+        <input type="text" id="csvOutput" readonly>
+        <button onclick="copyToClipboard()">Select All</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const formData = {};
+        let csvRow = '';
+        let csvData = {};
+
+        async function initialize() {
+            const response = await fetch('workouts.csv');
+            const csvText = await response.text();
+            csvData = parseCSVData(csvText);
+            populateDropdowns();
+        }
+
+        function parseCSVData(csv) {
+            const rows = csv.split('\n').slice(1).filter(r => r.trim());
+            return rows.reduce((acc, row) => {
+                const cells = parseCSVRow(row);
+                if(cells.length < 10) return acc;
+                
+                acc.types.add(cells[0]);
+                acc.exercises.add(cells[1]);
+                acc.subexercises.add(cells[2]);
+                acc.slovenes.add(cells[3]);
+                acc.occasions.add(cells[7]);
+                return acc;
+            }, {
+                types: new Set(),
+                exercises: new Set(),
+                subexercises: new Set(),
+                slovenes: new Set(),
+                occasions: new Set()
+            });
+        }
+
+        function parseCSVRow(row) {
+            const cells = [];
+            let currentCell = '';
+            let inQuotes = false;
+
+            for (const char of row) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    cells.push(currentCell.trim());
+                    currentCell = '';
+                } else {
+                    currentCell += char;
+                }
+            }
+            cells.push(currentCell.trim());
+            return cells;
+        }
+
+        function populateDropdowns() {
+            populateDropdown('type', csvData.types);
+            populateDropdown('exercise', csvData.exercises);
+            populateDropdown('subexercise', csvData.subexercises);
+            populateDropdown('exercise_slovene', csvData.slovenes);
+            populateDropdown('occasion', csvData.occasions);
+        }
+
+        function populateDropdown(name, values) {
+            const select = document.querySelector(`[name="${name}"]`);
+            Array.from(values).sort().forEach(value => {
+                if(value) {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
+                }
+            });
+            // Add Custom option
+            const customOption = document.createElement('option');
+            customOption.value = 'Custom';
+            customOption.textContent = 'Custom...';
+            select.appendChild(customOption);
+        }
+
+        function toggleCustomInput(select, customFieldName) {
+            const customInput = document.querySelector(`[name="${customFieldName}"]`);
+            if(select.value === 'Custom') {
+                customInput.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customInput.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
+            }
+        }
+
+        // Rest of the existing functions (nextStep, prevStep, generateCSVRow, etc.)
+        // ... [Keep all existing functions from previous version but update generateCSVRow] ...
+
+        function generateCSVRow() {
+            const getValue = (field, customField) => {
+                const select = document.querySelector(`[name="${field}"]`);
+                return select.value === 'Custom' 
+                    ? document.querySelector(`[name="${customField}"]`).value
+                    : select.value;
+            };
+
+            formData.type = getValue('type', 'custom_type');
+            formData.exercise = getValue('exercise', 'custom_exercise');
+            formData.subexercise = getValue('subexercise', 'custom_subexercise');
+            formData.exercise_slovene = getValue('exercise_slovene', 'custom_slovene');
+            formData.occasion = getValue('occasion', 'custom_occasion');
+
+            const weightVal = formData.weight ? 
+                `${formData.weight}${document.querySelector('[name="weight_unit"]').value}` 
+                : '';
+
+            csvRow = [
+                formData.type,
+                `"${formData.exercise.replace(/"/g, '""')}"`,
+                formData.subexercise ? `"${formData.subexercise.replace(/"/g, '""')}"` : '',
+                formData.exercise_slovene ? `"${formData.exercise_slovene.replace(/"/g, '""')}"` : '',
+                formData.reps,
+                weightVal,
+                formData.date || new Date().toISOString().split('T')[0],
+                formData.occasion ? `"${formData.occasion.replace(/"/g, '""')}"` : '',
+                formData.short_note ? `"${formData.short_note.replace(/"/g, '""')}"` : '',
+                formData.whole_note ? `"${formData.whole_note.replace(/"/g, '""')}"` : ''
+            ].join(',');
+        }
+
+        // Initialize when page loads
+        initialize();
+        // ... [Keep rest of the existing code unchanged] ...
+    </script>
+</body>
+</html>

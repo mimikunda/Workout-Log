@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Entry Wizard</title>
+    <style> 
+    :root {
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+                }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+        }   
+       
+        .weight-input { display: flex; }
+        .step { display: none; }
+        .active { display: block; }
+        .progress-bar { width: 100%; height: 20px; background: #000; }
+        .progress { height: 100%; background: var(--accent-gradient); transition: width 0.3s; }
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; }
+        input, button, select { margin: 10px 0; padding: 8px; }
+        button { background: var(--accent-gradient); color: #000; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        #copySection { display: none; margin-top: 20px; }
+        #csvOutput { width: 100%; padding: 8px; margin-top: 10px; }
+        
+        h2, p {
+        color: #00ccff;
+        }
+        
+        input, textarea, select {
+            background-color: #0e0e0e;
+            border: none;
+            border-radius: 6px;
+            color: #00ccff;
+            width: 100%;
+        }
+        
+        input[name="custom_type"] {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        datalist {
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            input, select, button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress" style="width: 0%"></div>
+    </div>
+
+    <form id="workoutForm">
+        <!-- Step 1 -->
+        <div class="step active" data-step="1">
+            <h2>Type & Exercise</h2>
+            <select name="type" required onchange="toggleCustomType(this)">
+                <option value="">Select Type</option>
+                <option value="Weightlifting">Weightlifting</option>
+                <option value="Powerlifting">Powerlifting</option>
+                <option value="Body">Body</option>
+                <option value="Other">Other</option>
+                <option value="Custom">Custom (Type Below)</option>
+            </select>
+            <input type="text" placeholder="Custom Type" name="custom_type">
+            <input list="exerciseList" placeholder="Exercise" required name="exercise">
+            <datalist id="exerciseList"></datalist>
+            <button type="button" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" data-step="2">
+            <h2>Details</h2>
+            <input list="subexerciseList" placeholder="Subexercise" name="subexercise">
+            <datalist id="subexerciseList"></datalist>
+            <input list="sloveneList" placeholder="Exercise Slovene" name="exercise_slovene">
+            <datalist id="sloveneList"></datalist>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(3)">Next</button>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" data-step="3">
+            <input type="number" placeholder="Reps" name="reps" required>
+            <div class="weight-input">
+               <input type="number" step="0.1" placeholder="Weight" name="weight">
+                <select name="weight_unit" style="width: 30%; margin-left: 5px;">
+                    <option value="kg">kg</option>
+                    <option value="lbs">lbs</option>
+                    <option value="cm">cm</option>
+                    <option value="m">m</option>
+                </select>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(4)">Next</button>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step" data-step="4">
+            <h2>Date & Notes</h2>
+            <input type="date" name="date" required>
+            <input list="occasionList" placeholder="Occasion" name="occasion">
+            <datalist id="occasionList"></datalist>
+            <input type="text" placeholder="Short Note" name="short_note">
+            <textarea placeholder="Whole Note" name="whole_note"></textarea>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Finish</button>
+        </div>
+    </form>
+
+    <div id="copySection">
+        <p>Copy the CSV line below:</p>
+        <input type="text" id="csvOutput" readonly>
+        <button onclick="copyToClipboard()">Select All</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const formData = {};
+        let csvRow = '';
+        let existingValues = {
+            exercises: new Set(),
+            subexercises: new Set(),
+            slovenes: new Set(),
+            occasions: new Set(),
+            types: new Set()
+        };
+
+        async function loadExistingData() {
+            const response = await fetch('workouts.csv');
+            const csvData = await response.text();
+            
+            csvData.split('\n').slice(1).forEach(row => {
+                const cells = [];
+                let currentCell = '';
+                let inQuotes = false;
+
+                for (const char of row) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        cells.push(currentCell.trim());
+                        currentCell = '';
+                    } else {
+                        currentCell += char;
+                    }
+                }
+                cells.push(currentCell.trim());
+
+                if (cells.length > 1) {
+                    existingValues.types.add(cells[0]);
+                    existingValues.exercises.add(cells[1]);
+                    existingValues.subexercises.add(cells[2]);
+                    existingValues.slovenes.add(cells[3]);
+                    if (cells[7]) existingValues.occasions.add(cells[7]);
+                }
+            });
+
+            // Populate datalists
+            populateDatalist('exerciseList', existingValues.exercises);
+            populateDatalist('subexerciseList', existingValues.subexercises);
+            populateDatalist('sloveneList', existingValues.slovenes);
+            populateDatalist('occasionList', existingValues.occasions);
+            updateTypeDropdown();
+        }
+
+        function populateDatalist(id, values) {
+            const datalist = document.getElementById(id);
+            datalist.innerHTML = '';
+            values.forEach(value => {
+                if (value) datalist.innerHTML += `<option value="${value}">`;
+            });
+        }
+
+        function updateTypeDropdown() {
+            const typeSelect = document.querySelector('[name="type"]');
+            existingValues.types.forEach(type => {
+                if (!['Weightlifting','Powerlifting','Body','Other'].includes(type)) {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    typeSelect.insertBefore(option, typeSelect.lastChild);
+                }
+            });
+        }
+
+        function toggleCustomType(select) {
+            const customInput = document.querySelector('[name="custom_type"]');
+            customInput.style.display = select.value === 'Custom' ? 'block' : 'none';
+            if (select.value !== 'Custom') customInput.value = '';
+        }
+
+        // ... rest of the previous script (nextStep, prevStep, generateCSVRow, etc) ...
+
+        // Initialize data loading when page loads
+        loadExistingData();
+    </script>
+</body>
+</html>

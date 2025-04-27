@@ -1,0 +1,24 @@
+type,exercise,subexercise,exercise_slovene,reps,weight,date,occasion,short_note,whole_note
+Body,Weight,Scale,Teža,,71.35kg,2025-02-22,,"zjutraj","na tešče"
+Body,Height,Standing,Višina,,182cm,2024-12-30,,,,
+Powerlifting,Bench,,Bench Press,5,65kg,2023-11-27,Training,,
+Powerlifting,Bench,"Larsen Press (noge v zraku)",Bench Press,5,65kg,2024-12-04,Training,,
+Powerlifting,Bench,,Bench Press,3,65kg,2023-12-31,Training,,
+Powerlifting,Bench,"with band (z20 s4)",Bench Press,1,65kg,2024-11-12,Training,"Elastika z20 s4","Top assistance: +20kg, Bottom: +4kg"
+Other,"Squat(deprecated)","S/Z Squat",Spredaj/zadaj,unknown,unknown,unknown,,,"Barbell position not specified (spredaj/zadaj)"
+Weightlifting,Snatch,"Power Snatch",Poteg na moč,1,55kg,2024-12-23,Max,,
+Weightlifting,"Front Squat","Počep spredaj",Počep spredaj,1,80kg,2024-12-23,Max,,
+Weightlifting,"Clean & Jerk","Nalog in potisk",Nalog in potisk,1,75kg,2024-11-05,Max,,"Clean: 80kg, Jerk: 75kg"
+Weightlifting,"Push Press","Tezno z odrivom spredaj",Tezno z odrivom spredaj,1,69kg,2025-01-11,"Max(casual)",
+Weightlifting,"Overhead Squat",Podsed,Počep,1,60kg,2024-02-10,"Training(1RM)",,"Failed 70kg (head position error)"
+Powerlifting,Bench,"Reverse Band",Bench Press,1,100kg,2024-01-22,"Training(1st 100kg!)","Reverse bands (z4 s20)","Failed 105kg (almost made it)"
+Powerlifting,Bench,"Resistance Bands",Bench Press,1,60kg,2025-01-08,Training,,"Failed 65kg mid-rep"
+Powerlifting,Bench,"Larsen Press (legs in air)",Bench Press,1,70kg,2025-01-29,Training,,"Failed 75kg (form mistake)"
+Powerlifting,Bench,"Narrow Grip",Bench Press,1,75kg,2025-02-05,Training,,"Stopped by coach"
+Powerlifting,Bench,,Bench Press,1,77kg,2025-02-12,Max,PR,Personal Record
+Weightlifting,Overhead Squat,"Tezno z odrivom spredaj",Tezno z odrivom spredaj,1,70kg,2024-12-20,Training,,"Could do more (time constraints)"
+Other,Squat,,Počep,1,80kg,2023-01-01,Bootcamp test,,"Pre-training max"
+Other,Deadlift,,Mrtvi dvig,1,100kg,2023-01-01,Bootcamp test,,"Pre-training max"
+"MyJunior (Boot Camp)",AMRAP,Trening1,AMRAP,unknown,unknown,unknown,,"library initialization failed - unable to allocate file descriptor table - out of memory",
+Powerlifting,"Bench","Larsen Press","Potisk prsi leže",3,70,2025-03-05,"Training(max)","good form","Beat the previous max, matched 3 reps to weight of 1 rep max. "
+

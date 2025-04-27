@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Visualization</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #ccc;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #121212;
+      color: transparent;
+      background-image: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      background: #222;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: transparent;
+      background-image: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    canvas {
+      background: #111;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-button {
+      background: var(--accent-gradient);
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Workout Visualization1.2</h1>
+    <p>ver. 1.2</p>
+  </header>
+
+  <div class="button-container">
+    <a href="maximain.html" class="back-button">Back to Log</a>
+  </div>
+
+  <div class="container">
+    <h2>All Exercises Overview</h2>
+    <canvas id="allExercisesChart"></canvas>
+
+    <h2>Powerlifting</h2>
+    <canvas id="benchPressPower"></canvas>
+    <canvas id="benchPressLarsen"></canvas>
+    <canvas id="benchPressNarrow"></canvas>
+
+    <h2>Weightlifting</h2>
+    <canvas id="cleanJerk"></canvas>
+    <canvas id="snatch"></canvas>
+    <canvas id="frontSquat"></canvas>
+    <canvas id="pushPress"></canvas>
+
+    <h2>Other</h2>
+    <canvas id="benchPressReverse"></canvas>
+    <canvas id="benchPressBands"></canvas>
+  </div>
+
+  <script>
+    const labels = ["27.11.24", "23.12.24", "8.1.25", "22.1.25", "29.1.25", "5.2.25", "12.2.25"];
+
+    const exerciseData = {
+      labels: labels,
+      datasets: [
+        { label: "Bench Press Power", data: [65, null, null, null, null, null, 77], borderColor: "#ff0000", backgroundColor: "rgba(255, 0, 0, 0.2)", fill: true },
+        { label: "Larsen Press", data: [null, null, null, null, 70, null, null], borderColor: "#00ff00", backgroundColor: "rgba(0, 255, 0, 0.2)", fill: true },
+        { label: "Narrow Grip", data: [null, null, null, null, null, 75, null], borderColor: "#0000ff", backgroundColor: "rgba(0, 0, 255, 0.2)", fill: true },
+        { label: "Clean & Jerk", data: [null, 75, null, null, null, null, null], borderColor: "#ff9900", backgroundColor: "rgba(255, 153, 0, 0.2)", fill: true },
+        { label: "Snatch", data: [null, 50, null, null, null, null, null], borderColor: "#ffff00", backgroundColor: "rgba(255, 255, 0, 0.2)", fill: true },
+        { label: "Reverse Band Bench", data: [null, null, null, 100, null, null, null], borderColor: "#ff00ff", backgroundColor: "rgba(255, 0, 255, 0.2)", fill: true },
+        { label: "Bench Press Bands", data: [null, null, 60, null, null, null, null], borderColor: "#00ffff", backgroundColor: "rgba(0, 255, 255, 0.2)", fill: true }
+      ]
+    };
+
+    function createChart(chartId, datasetLabel, dataPoints, color) {
+      new Chart(document.getElementById(chartId), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: datasetLabel,
+            data: dataPoints,
+            borderColor: color,
+            backgroundColor: color.replace("1)", "0.2)"),
+            fill: true
+          }]
+        }
+      });
+    }
+
+    // Render all charts
+    new Chart(document.getElementById("allExercisesChart"), { type: "line", data: exerciseData });
+
+    createChart("benchPressPower", "Bench Press Power", [65, null, null, null, null, null, 77], "rgba(255, 0, 0, 1)");
+    createChart("benchPressLarsen", "Larsen Press", [null, null, null, null, 70, null, null], "rgba(0, 255, 0, 1)");
+    createChart("benchPressNarrow", "Narrow Grip", [null, null, null, null, null, 75, null], "rgba(0, 0, 255, 1)");
+    createChart("cleanJerk", "Clean & Jerk", [null, 75, null, null, null, null, null], "rgba(255, 153, 0, 1)");
+    createChart("snatch", "Snatch", [null, 50, null, null, null, null, null], "rgba(255, 255, 0, 1)");
+    createChart("frontSquat", "Front Squat", [null, 80, null, null, null, null, null], "rgba(153, 0, 255, 1)");
+    createChart("pushPress", "Push Press", [null, null, null, null, null, 69, null], "rgba(0, 255, 255, 1)");
+    createChart("benchPressReverse", "Reverse Band Bench", [null, null, null, 100, null, null, null], "rgba(255, 0, 255, 1)");
+    createChart("benchPressBands", "Bench Press Bands", [null, null, 60, null, null, null, null], "rgba(0, 255, 255, 1)");
+  </script>
+</body>
+</html>

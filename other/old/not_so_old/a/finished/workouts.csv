@@ -1,0 +1,20 @@
+type,exercise,subexercise,exercise_slovene,reps,weight,date,short_note,whole_note
+Powerlifting,Bench,,Bench Press,5,65kg,2023-11-27,,
+Powerlifting,Bench,"noge v zraku",Bench Press,5,65kg,2023-12-04,,
+Powerlifting,Bench,,Bench Press,3,65kg,2023-12-11,,
+Powerlifting,Bench,"with band (z20 s4)",Bench Press,unknown,65kg,unknown,"Elastika z20 s4","Top assistance: +20kg, Bottom: +4kg"
+Powerlifting,Deadlift,"S/Z Squat",Mrtvi dvig,unknown,unknown,unknown,,"Barbell position not specified (spredaj/zadaj)"
+Weightlifting,Snatch,"Power Snatch",Poteg na moč,1,50kg,2023-12-23,,
+Weightlifting,"Front Squat","Počep spredaj",Počep spredaj,1,80kg,2023-12-23,,
+Weightlifting,"Clean & Jerk","Nalog in potisk",Nalog in potisk,1,75kg,unknown,,"Clean: 80kg, Jerk: 75kg"
+Weightlifting,"Push Press","Težno z odrivom spredaj",Težno z odrivom spredaj,1,69kg,unknown,,
+Weightlifting,Squat,Podsed,Počep,1,60kg,2024-02-10,,"Failed 70kg (head position error)"
+Other,Bench,"Reverse Band",Bench Press,1,100kg,2024-01-22,"Reverse bands","Failed 105kg (almost made it)"
+Other,Bench,"Resistance Bands",Bench Press,1,60kg,2024-01-08,,"Failed 65kg mid-rep"
+Powerlifting,Bench,"Larsen Press",Bench Press,1,70kg,2024-01-29,,"Failed 75kg (form mistake)"
+Powerlifting,Bench,"Narrow Grip",Bench Press,1,75kg,2024-02-05,,"Stopped by coach"
+Powerlifting,Bench,,Bench Press,1,77kg,2024-02-12,PR,
+Powerlifting,"Clean & Push Press","Težno z odrivom spredaj",Težno z odrivom spredaj,1,70kg,unknown,,"Could do more (time constraints)"
+Other,Squat,,Počep,1,80kg,2023-01-01,,"Pre-training max"
+Other,Deadlift,,Mrtvi dvig,1,100kg,2023-01-01,,"Pre-training max"
+"MyJunior (Boot Camp)",AMRAP,Trening1,AMRAP,unknown,unknown,unknown,"pozabu sm",

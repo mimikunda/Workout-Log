@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Log</title>
+    <style>
+        :root {
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #121212;
+            padding: 20px;
+            border-bottom: 2px solid #333;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            background-image: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .container {
+            width: 90%;
+            margin: 30px auto;
+            background: #222;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.1);
+        }
+        table {
+            width: 100%;
+            background: #111;
+            border-collapse: collapse;
+            margin: 15px 0;
+            border: 1px solid #333;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background: #333;
+            background-image: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        a {
+            color: #00ccff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #00ff99;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Workout Log 11</h1>
+        <nav><a href="visualization.html">View Visualizations</a></nav>
+    </header>
+    <div class="container" id="tablesContainer"></div>
+
+    <script>
+        async function loadAndDisplayData() {
+            const response = await fetch('workouts.csv');
+            const csvData = await response.text();
+            const workouts = parseCSV(csvData);
+            renderTables(workouts);
+        }
+
+        function parseCSV(csv) {
+            const rows = csv.split('\n').slice(1);
+            return rows.filter(row => row.trim()).map(row => {
+                const cells = [];
+                let currentCell = '';
+                let inQuotes = false;
+
+                for (const char of row) {
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        cells.push(currentCell.trim());
+                        currentCell = '';
+                    } else {
+                        currentCell += char;
+                    }
+                }
+                cells.push(currentCell.trim());
+                
+                return {
+                    type: cells[0],
+                    exercise: cells[1],
+                    subexercise: cells[2] || 'Standard',
+                    exercise_slovene: cells[3],
+                    reps: cells[4],
+                    weight: cells[5],
+                    date: cells[6],
+                    short_note: cells[7],
+                    whole_note: cells[8]
+                };
+            });
+        }
+
+        function renderTables(data) {
+            const categories = {
+                Powerlifting: [],
+                Weightlifting: [],
+                weighttest: [],
+                Other: [],
+                "MyJunior (Boot Camp)": []
+            };
+
+            data.forEach(workout => {
+                let category = workout.type;
+                // Special categorization rules
+
+                if (categories[category]) {
+                    categories[category].push(workout);
+                } else {
+                    categories.Other.push(workout);
+                }
+            });
+
+            const container = document.getElementById('tablesContainer');
+            
+            for (const [category, workouts] of Object.entries(categories)) {
+                if (!workouts.length) continue;
+
+                container.innerHTML += `
+                    <h2>${category}</h2>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Exercise</th>
+                            <th>Subexercise</th>
+                            <th>Slovene Name</th>
+                            <th>Reps</th>
+                            <th>Weight</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                        </tr>
+                        ${workouts.map(workout => `
+                            <tr>
+                                <td>${workout.type}</td>
+                                <td>${workout.exercise}</td>
+                                <td>${workout.subexercise}</td>
+                                <td>${workout.exercise_slovene}</td>
+                                <td>${workout.reps || '-'}</td>
+                                <td>${workout.weight}</td>
+                                <td>${workout.date || 'Unknown'}</td>
+                                <td>${workout.short_note || workout.whole_note || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `;
+            }
+        }
+
+        loadAndDisplayData();
+    </script>
+</body>
+</html>

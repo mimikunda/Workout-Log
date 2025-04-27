@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Entry Wizard</title>
+    <style> 
+    :root {
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+                }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: var(--accent-gradient);
+           /* color: #ccc; 
+            margin: 0;
+            padding: 0; */
+        }   
+       
+        .weight-input { display: flex; }
+        .step { display: none; }
+        .active { display: block; }
+        .progress-bar { width: 100%; height: 20px; background: #000; }
+        .progress { height: 100%; background: var(--accent-gradient); transition: width 0.3s; }
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; }
+        input, button { margin: 10px 0; padding: 8px; width: 100%; }
+        button { background: var(--accent-gradient); color: #000; border: none; border-radius: 5px; cursor: pointer; }
+        #copySection { display: none; margin-top: 20px; }
+        #csvOutput { width: 100%; padding: 8px; margin-top: 10px; }
+        
+        h2, p {
+        color: #00ccff;
+        }
+        
+          input, textarea, select {
+        background-color: #0e0e0e;
+        border: none;
+        border-radius: 6px;
+        color: #00ccff;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress" style="width: 0%"></div>
+    </div>
+
+    <form id="workoutForm">
+        <!-- Step 1 -->
+        <div class="step active" data-step="1">
+            <h2>Type & Exercise</h2>
+            <input type="text" placeholder="Type" required name="type">
+            <input type="text" placeholder="Exercise" required name="exercise">
+            <button type="button" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" data-step="2">
+            <h2>Details</h2>
+            <input type="text" placeholder="Subexercise" name="subexercise">
+            <input type="text" placeholder="Exercise Slovene" name="exercise_slovene">
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(3)">Next</button>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" data-step="3"
+            <input type="number" placeholder="Reps" name="reps">
+            <div class="weight-input">
+               <input type="number" step="0.1" placeholder="Weight" name="weight">
+                <select name="weight_unit" id="weightUnit" style="width: 30%; margin-left: 5px;">
+                  <option value="kg">kg</option>
+                  <option value="lbs">lbs</option>
+                  <option value="cm">cm</option>
+                  <option value="m">m</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(4)">Next</button>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step" data-step="4">
+            <h2>Date & Notes</h2>
+            <input type="date" name="date" required>
+            <input type="text" placeholder="Occasion" name="occasion">
+            <input type="text" placeholder="Short Note" name="short_note">
+            <textarea placeholder="Whole Note" name="whole_note"></textarea>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Finish</button>
+        </div>
+    </form>
+
+    <div id="copySection">
+        <p>Copy the CSV line below:</p>
+        <input type="text" id="csvOutput" readonly>
+        <button onclick="copyToClipboard()">Select All</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const formData = {};
+        let csvRow = '';
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.querySelector('.progress').style.width = `${progress}%`;
+        }
+
+        function nextStep(step) {
+            // Validate required fields
+            if (currentStep === 1 && (!document.querySelector('[name="type"]').value || 
+                                     !document.querySelector('[name="exercise"]').value)) {
+                alert('Please fill in required fields');
+                return;
+            }
+
+            // Collect data from current step
+            const inputs = document.querySelector(`[data-step="${currentStep}"]`).querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                formData[input.name] = input.value;
+            });
+
+            document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep = step;
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+        }
+
+        function prevStep() {
+            document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep--;
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+        }
+
+        function generateCSVRow() {
+            // Define which fields should not be quoted
+            const unquotedFields = ['type', 'reps', 'weight', 'date'];
+
+            // Generate the CSV row
+            csvRow = [
+                formData.type, // No quotes
+                `"${formData.exercise?.replace(/"/g, '""') || ''}"`,
+                formData.subexercise ? `"${formData.subexercise.replace(/"/g, '""')}"` : '',
+                formData.exercise_slovene ? `"${formData.exercise_slovene.replace(/"/g, '""')}"` : '',
+                formData.reps, // No quotes
+                formData.weight, // No quotes
+                formData.date || new Date().toISOString().split('T')[0], // No quotes, default to today
+                formData.occasion ? `"${formData.occasion.replace(/"/g, '""')}"` : '',
+                formData.short_note ? `"${formData.short_note.replace(/"/g, '""')}"` : '',
+                formData.whole_note ? `"${formData.whole_note.replace(/"/g, '""')}"` : ''
+            ].map((field, index) => {
+                // Skip empty fields (except for required ones)
+                if (field === '""' || field === '') return '';
+                return field;
+            }).filter(field => field !== '').join(',');
+
+            // Ensure proper CSV format by adding empty fields for skipped columns
+            const expectedColumns = 10; // Total number of columns in your CSV
+            const filledColumns = csvRow.split(',').length;
+            if (filledColumns < expectedColumns) {
+                const emptyColumns = Array(expectedColumns - filledColumns).fill('');
+                csvRow = csvRow.split(',').concat(emptyColumns).join(',');
+            }
+        }
+
+        function copyToClipboard() {
+            const csvOutput = document.getElementById('csvOutput');
+            csvOutput.select();
+            csvOutput.setSelectionRange(0, 99999); // For mobile devices
+            alert('Text selected! Press Ctrl+C (or Cmd+C) to copy.');
+        }
+
+        document.getElementById('workoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect final step data
+            const inputs = document.querySelector(`[data-step="${currentStep}"]`).querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                formData[input.name] = input.value;
+            });
+
+            // Generate CSV row
+            generateCSVRow();
+
+            // Show the copy section and populate the text field
+            document.getElementById('copySection').style.display = 'block';
+            document.getElementById('csvOutput').value = csvRow;
+
+            // Reset form for new entry
+            this.reset();
+            currentStep = 1;
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`[data-step="1"]`).classList.add('active');
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

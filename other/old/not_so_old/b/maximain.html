@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workout Log</title>
+  <style>
+    :root {
+      --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #ccc;
+    }
+
+    header {
+      background-color: #121212;
+      color: transparent;
+      background-image: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      padding: 10px 20px;
+      text-align: center;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      background: #222;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: transparent;
+      background-image: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      background-color: #111;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #333;
+      color: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .legend {
+      font-style: italic;
+      font-size: 0.9em;
+      color: var(--accent-gradient);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .inactive {
+      color: #666;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Workout Log</h1>
+  </header>
+  <div class="container">
+    <!-- Powerlifting Section -->
+    <div class="section">
+      <h2>Powerlifting</h2>
+
+      <h3>Bench Press - Power Style</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>77kg</td>
+          <td>12.2.25</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>5x</td>
+          <td>65kg</td>
+          <td>27.11.24</td>
+          <td></td>
+        </tr>
+      </table>
+
+      <h3>Bench Press - Larsen Press (Legs Up)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>70kg</td>
+          <td>29.1.25</td>
+          <td>Failed 75kg due to form mistake</td>
+        </tr>
+      </table>
+
+      <h3>Bench Press - Narrow Grip</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>75kg</td>
+          <td>5.2.25</td>
+          <td>Stopped because coach said so</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Weightlifting Section -->
+    <div class="section">
+      <h2>Weightlifting</h2>
+
+      <h3>Clean & Jerk</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>75kg</td>
+          <td>[---]</td>
+          <td>Only clean: 80kg</td>
+        </tr>
+      </table>
+
+      <h3>Snatch (Poteg)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>50kg</td>
+          <td>23.12.24</td>
+          <td>Power snatch</td>
+        </tr>
+      </table>
+
+      <h3>Front Squat (Počep Spredaj)</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>80kg</td>
+          <td>23.12.24</td>
+          <td></td>
+        </tr>
+      </table>
+
+      <h3>Push Press</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>69kg</td>
+          <td>[---]</td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Other Section -->
+    <div class="section">
+      <h2>Other</h2>
+
+      <h3>Bench Press - Reverse Band</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>100kg</td>
+          <td>22.1.25</td>
+          <td>Failed 105kg (almost made it)</td>
+        </tr>
+      </table>
+
+      <h3>Bench Press - Resistance Bands</h3>
+      <table>
+        <tr>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Date</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>1x</td>
+          <td>60kg</td>
+          <td>8.1.25</td>
+          <td>Failed 65kg mid-rep</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Legend Section -->
+    <div class="section legend">
+      <h3>Legenda</h3>
+      <ul>
+        <li>[---] ni podatka</li>
+        <li>[...] prisotne druge vaje, vendar ni podatka</li>
+        <li>[(DD.MM.YY)] datum. Če je število 00, potem ni podatka za tisti del datuma oziroma ni pomemben</li>
+        <li><em>[Poševen tekst]</em> opomba</li>
+        <li><del>[Prečrtan tekst]</del> ne delam</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

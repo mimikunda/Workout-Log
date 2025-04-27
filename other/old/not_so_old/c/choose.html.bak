@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Navigation Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #0e0e0e;
+        }
+        h1 {
+            color: #bbb;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            font-size: 30px;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(darkred, darkorange);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+         .button2 {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            font-size: 30px;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(darkblue, darkgreen);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Simple Site</h1>
+    <div class="button-container">
+        <a href="maximain.html" class="button2">Go to Maxi MAIN (nedokončano) </a>
+        <a href="finished/maximain.html" class="button2">Go to Maxi MAIN (nedokončano) NOVA verzija</a>
+        <a href="maxi2.html" class="button">Go to Maxi 2</a>
+        <a href="maxi3.html" class="button">Go to 3</a>
+    </div>
+      <div class="button-container">
+        <a href="maxi4.html" class="button">Go to Maxi 4</a>
+        <a href="maxi5.html" class="button">Go to Maxi 5</a>
+        <a href="visualisation.html" class="button2">Go to visualisation</a>
+        <a href="zapiski.html" class="button">404 (al pa zapiski idk)</a> <br>
+   /* </div>
+      <div class="button-container">
+        <a href="maxi6.html" class="button">Go to Maxi 6</a>
+        <a href="maxi.html" class="button">Go to Maxi</a>
+        <a href="index.html" class="button">Go to Index</a>
+        <a href="choose.html" class="button">Go to Choose</a> <br>
+    </div> */
+</body>
+</html>
+

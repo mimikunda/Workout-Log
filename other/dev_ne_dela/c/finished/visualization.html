@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.1"></script>
+    <style>
+        :root { --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff); }
+        body { font-family: Arial, sans-serif; background: #000; color: #ccc; margin: 0; padding: 0; }
+        header { background: #121212; padding: 20px; border-bottom: 2px solid #333; }
+        h1 { margin: 0; font-size: 2.5em; color: transparent; background-image: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; }
+        .chart-container { width: 90%; margin: 30px auto; background: #222; padding: 25px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 255, 153, 0.1); }
+        canvas { width: 100%!important; height: 500px!important; }
+        a { color: #00ccff; text-decoration: none; transition: color 0.3s; } 
+        a:hover { color: #00ff99; }
+        .chart-container { margin-bottom: 40px; }
+        #toggleMode { 
+            background: var(--accent-gradient); 
+            border: none; 
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Workout Visualizations</h1>
+        <p>ver 1.4(c) - with rep-specific tracking</p>
+        <nav>
+            <a href="maximain.html">View Log |</a> 
+            <a href="autocsv.html">Create New Entry |</a>
+            <a href="choose.html">Go to List (deprecated)</a>
+            <button id="toggleMode">Toggle 1RM Calculation (BETA)! ne dela</button>
+        </nav>
+    </header>
+
+    <script>
+        const { DateTime } = luxon;
+        let allWorkouts = [];
+        let use1RM = false;
+        let charts = [];
+
+        async function createVisualizations() {
+            const response = await fetch('workouts.csv');
+            const csvData = await response.text();
+            allWorkouts = parseCSV(csvData);
+            renderCharts();
+        }
+
+        function parseCSV(csv) {
+            return csv.split('\n').slice(1)
+                .filter(row => row.trim())
+                .map(row => {
+                    const cells = [];
+                    let currentCell = '';
+                    let inQuotes = false;
+
+                    for (const char of row) {
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            cells.push(currentCell.trim());
+                            currentCell = '';
+                        } else {
+                            currentCell += char;
+                        }
+                    }
+                    cells.push(currentCell.trim());
+                    
+                    return {
+                        type: cells[0],
+                        exercise: cells[1],
+                        subexercise: cells[2] || 'Standard',
+                        reps: cells[4] || '1',
+                        weight: cells[5],
+                        date: cells[6]
+                    };
+                })
+                .filter(workout => 
+                    workout.weight && workout.date &&
+                    workout.weight !== 'unknown' &&
+                    DateTime.fromISO(workout.date).isValid
+                );
+        }
+
+        function parseWeight(weightStr) {
+            return parseFloat(weightStr.replace(/[^0-9.]/g, '')) || 0;
+        }
+
+        function calculate1RM(weight, reps) {
+            const weightNum = parseWeight(weight);
+            const repsNum = parseInt(reps) || 1;
+            return weightNum * (1 + repsNum / 30); // Epley formula
+        }
+
+        function renderCharts() {
+            // Clear existing charts
+            charts.forEach(chart => chart.destroy());
+            charts = [];
+            document.querySelectorAll('.chart-container').forEach(container => container.remove());
+
+            const typeGroups = {
+                'Body': [],
+                'Powerlifting': [],
+                'Weightlifting': [],
+                'Other': []
+            };
+
+            allWorkouts.forEach(workout => {
+                const type = Object.keys(typeGroups).includes(workout.type) 
+                    ? workout.type 
+                    : 'Other';
+                typeGroups[type].push(workout);
+            });
+
+            Object.entries(typeGroups).forEach(([type, workouts]) => {
+                if (workouts.length === 0) return;
+
+                const container = document.createElement('div');
+                container.className = 'chart-container';
+                container.innerHTML = `<h2>${type}</h2>`;
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+                document.body.appendChild(container);
+
+                const exerciseMap = workouts.reduce((acc, workout) => {
+                    const label = type === 'Powerlifting' 
+                        ? `${workout.exercise} - ${workout.subexercise} (${workout.reps} reps)`
+                        : `${workout.exercise} (${workout.reps} reps)`;
+
+                    if (!acc[label]) acc[label] = [];
+                    acc[label].push(workout);
+                    return acc;
+                }, {});
+
+                const datasets = Object.entries(exerciseMap).map(([label, workouts]) => {
+                    const sorted = workouts.sort((a, b) => 
+                        DateTime.fromISO(a.date) - DateTime.fromISO(b.date)
+                    );
+
+                    return {
+                        label,
+                        data: sorted.map(w => ({
+                            x: DateTime.fromISO(w.date).toJSDate(),
+                            y: use1RM ? calculate1RM(w.weight, w.reps) : parseWeight(w.weight)
+                        })),
+                        borderColor: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                        tension: 0.3,
+                        pointRadius: 4
+                    };
+                });
+
+                charts.push(new Chart(canvas, {
+                    type: 'line',
+                    data: { datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: { tooltipFormat: 'MMM dd, yyyy' },
+                                adapters: { date: DateTime },
+                                grid: { color: '#333' },
+                                ticks: { color: '#ccc' }
+                            },
+                            y: {
+                                title: { 
+                                    display: true, 
+                                    text: use1RM ? 'Estimated 1RM (kg)' : 'Weight (kg)',
+                                    color: '#ccc'
+                                },
+                                grid: { color: '#333' },
+                                ticks: { color: '#ccc' },
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#ccc' } }
+                        }
+                    }
+                }));
+            });
+        }
+
+        document.getElementById('toggleMode').addEventListener('click', () => {
+            use1RM = !use1RM;
+            renderCharts();
+        });
+
+        createVisualizations();
+    </script>
+</body>
+</html>
