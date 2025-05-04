@@ -24,7 +24,7 @@ Weightlifting,Push Press,"Tezno z odrivom spredaj",Tezno z odrivom spredaj,1,70k
 Other,Squat,,Počep,1,80kg,2024-01-01,Bootcamp test,,"Pre-training max"
 Other,Deadlift,,Mrtvi dvig,1,100kg,2024-01-01,Bootcamp test,,"Pre-training max"
 "MyJunior (Boot Camp)",AMRAP,Trening1,AMRAP,unknown,unknown,unknown,,"library initialization failed - unable to allocate file descriptor table - out of memory",
-Powerlifting,"Bench","Larsen",/slo?"Potisk prsi leže",3,70kg,2025-03-05,"Training(max)","good form","Beat the previous max, matched 3 reps to weight of 1 rep max. "
+Powerlifting,"Bench","Larsen","/slo?Potisk prsi leže",3,70kg,2025-03-05,"Training(max)","good form","Beat the previous max and matched 3 reps to weight of 1 rep max. "
 Powerlifting,Bench,,/slo,3,67.5kg,2025-03-12,"Training","uredu","Izboljsal 2.5 kg",
 Powerlifting,"Bench",Larsen,"/slo",2,70kg,2025-03-19,"Training(max)","ni taprav max (lahko bi se)","Ok",
 Powerlifting,"Bench","Resistance Bands","/slo",1,67.5kg,2025-04-02,"Max(casual)","Elastika 2, almost failed (form mistake)","Skoraj mi ni uspelo ker mi je elastika povlekla proti trupu stran od glave."
