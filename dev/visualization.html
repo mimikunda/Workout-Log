@@ -1,22 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="icon" type="image/png" href="../assets/icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Visualizations</title>
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.1"></script>
-    <style>
-        :root { --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff); }
-        body { font-family: Arial, sans-serif; background: #000; color: #ccc; margin: 0; padding: 0; }
-        header { background: #121212; padding: 20px; border-bottom: 2px solid #333; }
-        h1 { margin: 0; font-size: 2.5em; color: transparent; background-image: var(--accent-gradient); -webkit-background-clip: text; background-clip: text; }
-        .chart-container { width: 90%; margin: 30px auto; background: #222; padding: 25px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 255, 153, 0.1); }
-        canvas { width: 100%!important; height: 500px!important; }
-        a { color: #00ccff; text-decoration: none; transition: color 0.3s; } 
-        a:hover { color: #00ff99; }
-        .chart-container { margin-bottom: 40px; }
+    <link rel="stylesheet" href="../assets/style.css">
+   <!-- <style>
+        :root { 
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff); 
+        }
+        body {
+             font-family: Arial, sans-serif;
+              background: #000; color: #ccc; 
+              margin: 0;
+               padding: 0; 
+            }
+        header { 
+            background: #121212; 
+            padding: 20px; 
+            border-bottom: 2px solid #333;
+         }
+        h1 { 
+            margin: 0; 
+            font-size: 2.5em; 
+            color: transparent; 
+            background-image: var(--accent-gradient); 
+            -webkit-background-clip: text; 
+            background-clip: text;
+         }
+        .chart-container { 
+            width: 90%; 
+            margin: 30px auto; 
+            background: #101010; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.1); 
+        }
+
+
+        canvas { 
+            width: 100%!important; 
+            height: 500px!important; 
+        }
+        a { 
+            color: #00ccff; 
+            text-decoration: none; 
+            transition: color 0.3s; 
+        } 
+        a:hover { 
+            color: #00ff99; 
+        }
+        .chart-container {
+             margin-bottom: 40px;
+             }
+             
         #toggleMode { 
             background: var(--accent-gradient); 
             border: none; 
@@ -25,30 +66,71 @@
             cursor: pointer;
             margin-left: 15px;
         }
-    </style>
+        
+        /* New styles for tabbed interface */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #121212;
+            border-bottom: 1px solid #333;
+        }
+        .tab-button {
+            background: #222;
+            border: 1px solid #333;
+            color: #ccc;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-button:hover {
+            background: #333;
+        }
+        .tab-button.active {
+            background: var(--accent-gradient);
+            color: #000;
+            border-color: transparent;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .exercise-title {
+            color: #00ccff;
+            margin: 20px 0 10px 5%;
+            font-size: 1.3em;
+        }
+    </style> -->
 </head>
 <body>
     <header>
         <h1>Workout Visualizations</h1>
-        <p>ver 2.1(main +dev) - with rep-specific tracking (beta)</p>
+        <p class="version">ver 3.1(main +dev) CSS change! - with rep-specific tracking (beta)</p>
         <nav>
             <a href="maximain.html">View Log |</a> 
             <a href="autocsv.html">Create New Entry |</a>
             <a href="choose.html">Go to List (deprecated)</a>
-            <button id="toggleMode">Toggle 1RM Calculation (BETA)! ne dela</button>
         </nav>
+        
     </header>
+
+    <div class="tab-buttons" id="tabButtons"><button id="toggleMode" class="customButtonFor1RMCalculation">Toggle 1RM Calculation (BETA)</button></div> 
 
     <script>
         const { DateTime } = luxon;
         let allWorkouts = [];
         let use1RM = false;
         let charts = [];
+        let currentTab = 'Body';
 
         async function createVisualizations() {
             const response = await fetch('../assets/workouts.csv');
             const csvData = await response.text();
             allWorkouts = parseCSV(csvData);
+            setupTabs();
             renderCharts();
         }
 
@@ -98,12 +180,8 @@
             return weightNum * (1 + repsNum / 30); // Epley formula
         }
 
-        function renderCharts() {
-            // Clear existing charts
-            charts.forEach(chart => chart.destroy());
-            charts = [];
-            document.querySelectorAll('.chart-container').forEach(container => container.remove());
-
+        function setupTabs() {
+            const tabButtons = document.getElementById('tabButtons');
             const typeGroups = {
                 'Body': [],
                 'Powerlifting': [],
@@ -118,28 +196,82 @@
                 typeGroups[type].push(workout);
             });
 
-            Object.entries(typeGroups).forEach(([type, workouts]) => {
-                if (workouts.length === 0) return;
+            Object.keys(typeGroups).forEach(type => {
+                if (typeGroups[type].length === 0) return;
+                
+                const button = document.createElement('button');
+                button.className = 'tab-button';
+                if (type === currentTab) button.classList.add('active');
+                button.textContent = type;
+                button.onclick = () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    currentTab = type;
+                    renderCharts();
+                };
+                tabButtons.appendChild(button);
+            });
+        }
+
+        function renderCharts() {
+            // Clear existing charts
+            charts.forEach(chart => chart.destroy());
+            charts = [];
+            document.querySelectorAll('.tab-content').forEach(content => content.remove());
+
+            const tabContent = document.createElement('div');
+            tabContent.className = 'tab-content active';
+            document.body.appendChild(tabContent);
+
+            const currentWorkouts = allWorkouts.filter(workout => {
+                const type = Object.keys({
+                    'Body': [],
+                    'Powerlifting': [],
+                    'Weightlifting': [],
+                    'Other': []
+                }).includes(workout.type) ? workout.type : 'Other';
+                return type === currentTab;
+            });
+
+            if (currentWorkouts.length === 0) {
+                tabContent.innerHTML = '<p>No data available for this category.</p>';
+                return;
+            }
+
+            // Group by exercise and subexercise
+            const exerciseGroups = currentWorkouts.reduce((acc, workout) => {
+                const key = `${workout.exercise}|${workout.subexercise}`;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(workout);
+                return acc;
+            }, {});
+
+            Object.entries(exerciseGroups).forEach(([key, workouts]) => {
+                const [exercise, subexercise] = key.split('|');
+                
+                const title = document.createElement('h2');
+                title.className = 'exercise-title';
+                title.textContent = subexercise === 'Standard' 
+                    ? exercise 
+                    : `${exercise} - ${subexercise}`;
+                tabContent.appendChild(title);
 
                 const container = document.createElement('div');
                 container.className = 'chart-container';
-                container.innerHTML = `<h2>${type}</h2>`;
                 const canvas = document.createElement('canvas');
                 container.appendChild(canvas);
-                document.body.appendChild(container);
+                tabContent.appendChild(container);
 
-                const exerciseMap = workouts.reduce((acc, workout) => {
-                    const label = type === 'Powerlifting' 
-                        ? `${workout.exercise} - ${workout.subexercise} (${workout.reps} reps)`
-                        : `${workout.exercise} (${workout.reps} reps)`;
-
-                    if (!acc[label]) acc[label] = [];
-                    acc[label].push(workout);
+                // Further group by reps for different lines
+                const repGroups = workouts.reduce((acc, workout) => {
+                    const repLabel = `${workout.reps} reps`;
+                    if (!acc[repLabel]) acc[repLabel] = [];
+                    acc[repLabel].push(workout);
                     return acc;
                 }, {});
 
-                const datasets = Object.entries(exerciseMap).map(([label, workouts]) => {
-                    const sorted = workouts.sort((a, b) => 
+                const datasets = Object.entries(repGroups).map(([label, repWorkouts]) => {
+                    const sorted = repWorkouts.sort((a, b) => 
                         DateTime.fromISO(a.date) - DateTime.fromISO(b.date)
                     );
 

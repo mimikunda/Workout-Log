@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/png" href="../assets/icon.png">
+    <title>Workout Entry Wizard</title>
+    <link rel="stylesheet" href="../assets/style.css">
+   <!-- <style> 
+    
+    :root {
+            --accent-gradient: linear-gradient(90deg, #00ff99, #00ccff);
+            color-scheme: dark !important;
+            
+                }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #ccc;
+            margin: 0;
+            padding: 0;
+        }   
+       
+        .weight-input { display: flex; }
+        .step { display: none; }
+        .active { display: block; }
+        .progress-bar { width: 100%; height: 17px; background: #000; border: 3px transparent; border-radius: 8px; margin: 6px; }
+        .progress { height: 100%; background: var(--accent-gradient); transition: width 0.3s; }
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px;}
+        input, button, select { margin: 10px 0; padding: 8px; }
+        button { background: var(--accent-gradient); color: #000; border: none; border-radius: 5px; cursor: pointer; width: 100%; }
+        #copySection { display: none; margin-top: 20px; }
+        #csvOutput { width: 100%; padding: 8px; margin-top: 10px; }
+        
+        h1 { 
+            margin: 0; 
+            font-size: 2.5em; 
+            color: transparent; 
+            background-image: var(--accent-gradient); 
+            -webkit-background-clip: text; 
+            background-clip: text;
+        }
+
+        a { 
+            color: #00ccff; 
+            text-decoration: none; 
+            transition: color 0.3s; 
+        } 
+        a:hover { 
+            color: #00ff99; 
+        }
+
+        h2, p {
+        color: #00ccff;
+        }
+        
+        form {
+            background-color: #080808;
+            border: 2px solid #00ccff;
+            padding: 12px;
+            border-radius: 10px;
+        }
+        
+        input, textarea, select {
+            background-color: #0e0e0e;
+            border: none;
+            border-radius: 6px;
+            color: #00ccff;
+            width: 97%;
+        }
+        
+        .custom-input {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .hint {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+    </style> -->
+</head>
+<body>
+    <header>
+        <h1>Workout CSV creator</h1>
+        <p class="version">ver 2.1(main +dev) CSS change!- with dynamic autoSelections</p>
+        <nav>
+            <a href="maximain.html">View Log |</a> 
+            <a href="autocsv.html">Create New Entry |</a>
+            <a href="choose.html">Go to List (deprecated)</a>
+        </nav>
+    </header>
+    <div class="progress-bar">
+        <div class="progress" style="width: 0%"></div>
+    </div>
+
+    <form id="workoutForm">
+        <!-- Step 1 -->
+        <div class="step active" data-step="1">
+            <h2>Type & Exercise</h2>
+            <select name="type" required onchange="handleTypeChange(this)">
+                <option value="">Select Type</option>
+                <option value="Weightlifting">Weightlifting</option>
+                <option value="Powerlifting">Powerlifting</option>
+                <option value="Body">Body</option>
+                <option value="Other">Other</option>
+                <option value="Custom">Custom (Type Below)</option>
+            </select>
+            <input type="text" placeholder="Custom Type" name="custom_type" class="custom-input">
+            
+            <select name="exercise" required onchange="handleExerciseChange(this)">
+                <option value="">Select Exercise</option>
+                <option value="Custom">Custom (Enter Below)</option>
+            </select>
+            <input type="text" placeholder="Custom Exercise" name="custom_exercise" class="custom-input">
+            
+            <button type="button" onclick="nextStep(2)">Next</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step" data-step="2">
+            <h2>Details</h2>
+            <select name="subexercise" onchange="handleSubexerciseChange(this)">
+                <option value="">Select Subexercise</option>
+                <option value="Standard">Standard</option>
+                <option value="Custom">Custom (Enter Below)</option>
+            </select>
+            <input type="text" placeholder="Custom Subexercise" name="custom_subexercise" class="custom-input">
+            
+            <input type="text" placeholder="Exercise Slovene (default: /slo)" name="exercise_slovene">
+            <p class="hint">Leave empty for default value "/slo"</p>
+            
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(3)">Next</button>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step" data-step="3">
+            <input type="number" placeholder="Reps" name="reps" required>
+            <div class="weight-input">
+               <input type="number" step="0.1" placeholder="Weight" name="weight">
+                <select name="weight_unit" style="width: 30%; margin-left: 5px;">
+                    <option value="kg">kg</option>
+                    <option value="lbs">lbs</option>
+                    <option value="cm">cm</option>
+                    <option value="m">m</option>
+                </select>
+            </div>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="button" onclick="nextStep(4)">Next</button>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step" data-step="4">
+            <h2>Date & Notes</h2>
+            <input type="date" name="date" required>
+            <input type="text" placeholder="Occasion" name="occasion">
+            <input type="text" placeholder="Short Note" name="short_note">
+            <textarea placeholder="Whole Note" name="whole_note"></textarea>
+            <button type="button" onclick="prevStep()">Back</button>
+            <button type="submit">Finish</button>
+        </div>
+    </form>
+
+    <div id="copySection">
+        <p>Copy the CSV line below:</p>
+        <input type="text" id="csvOutput" readonly>
+        <button onclick="copyToClipboard()">Select All</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+        const formData = {};
+        let csvRow = '';
+        let workoutData = [];
+        let exerciseMap = {};
+        let subexerciseMap = {};
+
+        // Fetch workout data from CSV
+        async function fetchWorkoutData() {
+            try {
+                const response = await fetch('../assets/workouts.csv');
+                const csvData = await response.text();
+                workoutData = parseCSV(csvData);
+                buildExerciseMaps();
+            } catch (error) {
+                console.error('Error loading workout data:', error);
+            }
+        }
+
+        function parseCSV(csv) {
+            return csv.split('\n').slice(1)
+                .filter(row => row.trim())
+                .map(row => {
+                    const cells = [];
+                    let currentCell = '';
+                    let inQuotes = false;
+
+                    for (const char of row) {
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            cells.push(currentCell.trim());
+                            currentCell = '';
+                        } else {
+                            currentCell += char;
+                        }
+                    }
+                    cells.push(currentCell.trim());
+                    
+                    return {
+                        type: cells[0],
+                        exercise: cells[1].replace(/"/g, ''),
+                        subexercise: cells[2] ? cells[2].replace(/"/g, '') : 'Standard',
+                        exercise_slovene: cells[3] || '/slo',
+                        reps: cells[4] || '1',
+                        weight: cells[5],
+                        date: cells[6]
+                    };
+                });
+        }
+
+        function buildExerciseMaps() {
+            exerciseMap = {};
+            subexerciseMap = {};
+            
+            workoutData.forEach(workout => {
+                // Build exercise map by type
+                if (!exerciseMap[workout.type]) {
+                    exerciseMap[workout.type] = new Set();
+                }
+                exerciseMap[workout.type].add(workout.exercise);
+                
+                // Build subexercise map by type and exercise
+                const key = `${workout.type}|${workout.exercise}`;
+                if (!subexerciseMap[key]) {
+                    subexerciseMap[key] = new Set();
+                }
+                subexerciseMap[key].add(workout.subexercise);
+            });
+        }
+
+        function toggleCustomInput(select, customFieldName) {
+            const customInput = document.querySelector(`[name="${customFieldName}"]`);
+            customInput.style.display = select.value === 'Custom' ? 'block' : 'none';
+            if (select.value !== 'Custom') customInput.value = '';
+        }
+
+        function handleTypeChange(select) {
+            toggleCustomInput(select, 'custom_type');
+            
+            // Update exercise dropdown based on selected type
+            const exerciseSelect = document.querySelector('[name="exercise"]');
+            const type = select.value === 'Custom' 
+                ? document.querySelector('[name="custom_type"]').value 
+                : select.value;
+            
+            // Clear existing options except first two
+            while (exerciseSelect.options.length > 2) {
+                exerciseSelect.remove(2);
+            }
+            
+            // Add exercises for this type
+            if (exerciseMap[type]) {
+                exerciseMap[type].forEach(exercise => {
+                    const option = document.createElement('option');
+                    option.value = exercise;
+                    option.textContent = exercise;
+                    exerciseSelect.appendChild(option);
+                });
+            }
+        }
+
+        function handleExerciseChange(select) {
+            toggleCustomInput(select, 'custom_exercise');
+            
+            // Update subexercise dropdown based on selected type and exercise
+            const subexerciseSelect = document.querySelector('[name="subexercise"]');
+            const typeSelect = document.querySelector('[name="type"]');
+            const type = typeSelect.value === 'Custom' 
+                ? document.querySelector('[name="custom_type"]').value 
+                : typeSelect.value;
+            const exercise = select.value === 'Custom' 
+                ? document.querySelector('[name="custom_exercise"]').value 
+                : select.value;
+            
+            // Clear existing options except first two (Select Subexercise and Custom)
+            while (subexerciseSelect.options.length > 3) {
+                subexerciseSelect.remove(3);
+            }
+            
+            // Add Standard option if it's not already there
+            if (!Array.from(subexerciseSelect.options).some(opt => opt.value === 'Standard')) {
+                const standardOption = document.createElement('option');
+                standardOption.value = 'Standard';
+                standardOption.textContent = 'Standard';
+                subexerciseSelect.insertBefore(standardOption, subexerciseSelect.options[1]);
+            }
+            
+            // Add subexercises for this type and exercise
+            const key = `${type}|${exercise}`;
+            if (subexerciseMap[key]) {
+                subexerciseMap[key].forEach(subexercise => {
+                    if (subexercise !== 'Standard') {
+                        const option = document.createElement('option');
+                        option.value = subexercise;
+                        option.textContent = subexercise;
+                        subexerciseSelect.appendChild(option);
+                    }
+                });
+            }
+        }
+
+        function handleSubexerciseChange(select) {
+            toggleCustomInput(select, 'custom_subexercise');
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.querySelector('.progress').style.width = `${progress}%`;
+        }
+
+        function nextStep(step) {
+            if (currentStep === 1 && (!document.querySelector('[name="type"]').value || 
+                                     !document.querySelector('[name="exercise"]').value)) {
+                alert('Please fill in required fields');
+                return;
+            }
+
+            const inputs = document.querySelector(`[data-step="${currentStep}"]`).querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                formData[input.name] = input.value;
+            });
+
+            document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep = step;
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+        }
+
+        function prevStep() {
+            document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep--;
+            document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+        }
+
+        function generateCSVRow() {
+            const typeSelect = document.querySelector('[name="type"]');
+            formData.type = typeSelect.value === 'Custom' 
+                ? document.querySelector('[name="custom_type"]').value
+                : typeSelect.value;
+                
+            const exerciseSelect = document.querySelector('[name="exercise"]');
+            formData.exercise = exerciseSelect.value === 'Custom' 
+                ? document.querySelector('[name="custom_exercise"]').value
+                : exerciseSelect.value;
+                
+            const subexerciseSelect = document.querySelector('[name="subexercise"]');
+            formData.subexercise = subexerciseSelect.value === 'Custom' 
+                ? document.querySelector('[name="custom_subexercise"]').value
+                : subexerciseSelect.value === '' ? 'Standard' : subexerciseSelect.value;
+                
+            formData.exercise_slovene = formData.exercise_slovene || '/slo';
+
+            const weightVal = formData.weight ? 
+                `${formData.weight}${document.querySelector('[name="weight_unit"]').value}` 
+                : '';
+
+            csvRow = [
+                formData.type,
+                `"${formData.exercise?.replace(/"/g, '""') || ''}"`,
+                formData.subexercise ? `"${formData.subexercise.replace(/"/g, '""')}"` : '',
+                formData.exercise_slovene ? `"${formData.exercise_slovene.replace(/"/g, '""')}"` : '',
+                formData.reps,
+                weightVal,
+                formData.date || new Date().toISOString().split('T')[0],
+                formData.occasion ? `"${formData.occasion.replace(/"/g, '""')}"` : '',
+                formData.short_note ? `"${formData.short_note.replace(/"/g, '""')}"` : '',
+                formData.whole_note ? `"${formData.whole_note.replace(/"/g, '""')}"` : ''
+            ].map(field => field || '').join(',');
+        }
+
+        function copyToClipboard() {
+            const csvOutput = document.getElementById('csvOutput');
+            csvOutput.select();
+            csvOutput.setSelectionRange(0, 99999);
+            alert('Text selected! Press Ctrl+C (or Cmd+C) to copy.');
+        }
+
+        document.getElementById('workoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const inputs = document.querySelector(`[data-step="${currentStep}"]`).querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                formData[input.name] = input.value;
+            });
+
+            generateCSVRow();
+
+            document.getElementById('copySection').style.display = 'block';
+            document.getElementById('csvOutput').value = csvRow;
+
+            this.reset();
+            currentStep = 1;
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`[data-step="1"]`).classList.add('active');
+            updateProgress();
+        });
+
+        // Initialize the form
+        fetchWorkoutData();
+    </script>
+</body>
+</html>

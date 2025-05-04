@@ -46,7 +46,7 @@
         let charts = [];
 
         async function createVisualizations() {
-            const response = await fetch('../assets/workouts.csv');
+            const response = await fetch('workouts.csv');
             const csvData = await response.text();
             allWorkouts = parseCSV(csvData);
             renderCharts();

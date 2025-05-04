@@ -89,7 +89,7 @@
 
     <script>
         async function loadAndDisplayData() {
-            const response = await fetch('../assets/workouts.csv');
+            const response = await fetch('workouts.csv');
             const csvData = await response.text();
             const workouts = parseCSV(csvData);
             renderTables(workouts);
