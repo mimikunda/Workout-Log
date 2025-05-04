@@ -8,7 +8,7 @@ Body,Height,SVK,Višina,,183.7cm,2025-03-10,Športni karton,, za sportni karton
 Other,Bench,,/slo,5,65kg,2024-01-01,Pre-training max,,
 Powerlifting,Bench,Larsen,/slo,5,65kg,2024-12-04,Training,,
 Powerlifting,Bench,,/slo,3,65kg,2024-06-30,Training,,  # Fixed date: 2024-06-30
-Powerlifting,Bench,Resistance Bands,/slo,1,60kg,2024-11-12,Training,Elastika 1,"Top assistance: +20kg, Bottom: +4kg"
+Powerlifting,Bench,Resistance Bands,/slo,1,60kg,2024-11-12,Training,Elastika 1,"Top assistance: +20kg, Bottom: +4kg",
 Other,Squat(deprecated),S/Z Squat,Spredaj/zadaj,,,,,Barbell position not specified (spredaj/zadaj)
 Weightlifting,Snatch,Power Snatch,Poteg na moč,1,55kg,2024-12-23,Max,,
 Weightlifting,Front Squat,Počep spredaj,Počep spredaj,1,80kg,2024-12-23,Max,,
